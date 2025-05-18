@@ -21,7 +21,7 @@ users["TaroYamada"] = {
 
 // ルートエンドポイント - 迅速に応答するよう明示的に設定
 app.get('/', (req, res) => {
-  res.status(200).send('Account Authentication API Server');
+  res.status(404).send('Account Authentication API Server');
 });
 
 // POST /signup - アカウント作成
