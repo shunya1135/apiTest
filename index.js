@@ -14,7 +14,7 @@ const users = {};
 // サーバー起動時にテスト用アカウントを作成（適切なパスワードに修正）
 users["TaroYamada"] = {
   user_id: "TaroYamada",
-  password: "PaSSwd4TY",  // 仕様書通りに修正
+  password: "PaSSwd4TY",
   nickname: "たろー",
   comment: "僕は元気です"
 };
@@ -78,7 +78,7 @@ app.post('/signup', (req, res) => {
   });
 });
 
-// GET /users/{user_id} - ユーザー情報取得（修正版）
+// GET /users/{user_id} - ユーザー情報取得
 app.get('/users/:user_id', (req, res) => {
   const { user_id } = req.params;
   
