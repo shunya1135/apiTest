@@ -114,14 +114,14 @@ app.patch('/users/:user_id', authenticateUser, (req, res) => {
   const { user_id } = req.params;
   const { nickname, comment } = req.body;
   
-  // ユーザー存在チェック
-  if (!users[user_id]) {
-    return res.status(404).json({ message: "No user found" });
-  }
-  
-  // 認証ユーザーと一致するか確認
+  // まず認証ユーザーと一致するか確認
   if (req.user.userId !== user_id) {
     return res.status(403).json({ message: "No permission for update" });
+  }
+  
+  // その後、ユーザー存在チェック
+  if (!users[user_id]) {
+    return res.status(404).json({ message: "No user found" });
   }
   
   // user_idやpasswordの更新禁止
@@ -187,7 +187,7 @@ app.post('/close', authenticateUser, (req, res) => {
 
 // ルートエンドポイント
 app.get('/', (req, res) => {
-  res.send('Account Authentication API Server');
+  res.status(200).send('Account Authentication API Server');
 });
 
 // サーバー起動
