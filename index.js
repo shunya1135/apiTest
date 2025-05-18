@@ -11,23 +11,32 @@ app.use(cors());
 // インメモリデータストア（実際のアプリではデータベースを使用）
 const users = {};
 
-// Basic認証の検証関数
+// サーバー起動時にテスト用アカウントを作成
+users["TaroYamada"] = {
+  user_id: "TaroYamada",
+  password: "PaSSwd4TY",
+  nickname: "たろー",
+  comment: "僕は元気です"
+};
+
+// Basic認証ミドルウェア（そのままでOK）
 function authenticateUser(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Basic ')) {
     return res.status(401).json({ message: "Authentication failed" });
   }
-  
-  const base64Credentials = authHeader.split(' ')[1];
-  const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
-  const [userId, password] = credentials.split(':');
-  
-  if (!users[userId] || users[userId].password !== password) {
+  try {
+    const base64Credentials = authHeader.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('utf-8');
+    const [userId, password] = credentials.split(':');
+    if (!users[userId] || users[userId].password !== password) {
+      return res.status(401).json({ message: "Authentication failed" });
+    }
+    req.user = { userId };
+    next();
+  } catch (error) {
     return res.status(401).json({ message: "Authentication failed" });
   }
-  
-  req.user = { userId };
-  next();
 }
 
 // エンドポイント1: POST /signup - アカウント作成
@@ -87,17 +96,14 @@ app.post('/signup', (req, res) => {
 // エンドポイント2: GET /users/{user_id} - ユーザー情報取得
 app.get('/users/:user_id', authenticateUser, (req, res) => {
   const { user_id } = req.params;
-  
   // ユーザー存在チェック
   if (!users[user_id]) {
     return res.status(404).json({ message: "No user found" });
   }
-  
   // 認証ユーザーと一致するか確認
   if (req.user.userId !== user_id) {
     return res.status(403).json({ message: "No permission for access" });
   }
-  
   // ユーザー情報を返す
   res.status(200).json({
     message: "User details by user_id",
